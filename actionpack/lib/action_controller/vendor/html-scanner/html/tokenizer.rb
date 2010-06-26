@@ -95,6 +95,7 @@ module HTML #:nodoc:
           while match = @scanner.scan_until(/[\\#{delim}]/)
             text << match
             break if @scanner.matched == delim
+            break if @scanner.eos?
             text << @scanner.getch # skip the escaped character
           end
         end
