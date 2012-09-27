@@ -914,7 +914,7 @@ module ActionController #:nodoc:
 
         layout = pick_layout(options)
         response.layout = layout.path_without_format_and_extension if layout
-        logger.info("Rendering template within #{layout.path_without_format_and_extension}") if logger && layout
+        logger.debug("Rendering template within #{layout.path_without_format_and_extension}") if logger && layout
 
         if content_type = options[:content_type]
           response.content_type = content_type.to_s
@@ -1136,7 +1136,7 @@ module ActionController #:nodoc:
 
       def redirect_to_full_url(url, status)
         raise DoubleRenderError if performed?
-        logger.info("Redirected to #{url}") if logger && logger.info?
+        logger.debug("Redirected to #{url}") if logger && logger.debug?
         response.redirect(url, interpret_status(status))
         @performed_redirect = true
       end
@@ -1248,7 +1248,7 @@ module ActionController #:nodoc:
     private
       def render_for_file(template_path, status = nil, layout = nil, locals = {}) #:nodoc:
         path = template_path.respond_to?(:path_without_format_and_extension) ? template_path.path_without_format_and_extension : template_path
-        logger.info("Rendering #{path}" + (status ? " (#{status})" : '')) if logger
+        logger.debug("Rendering #{path}" + (status ? " (#{status})" : '')) if logger
         render_for_text @template.render(:file => template_path, :locals => locals, :layout => layout), status
       end
 
@@ -1303,7 +1303,7 @@ module ActionController #:nodoc:
       end
 
       def log_processing
-        if logger && logger.info?
+        if logger && logger.debug?
           log_processing_for_request_id
           log_processing_for_parameters
         end
@@ -1314,14 +1314,14 @@ module ActionController #:nodoc:
         request_id << "to #{params[:format]} " if params[:format]
         request_id << "(for #{request_origin}) [#{request.method.to_s.upcase}]"
 
-        logger.info(request_id)
+        logger.debug(request_id)
       end
 
       def log_processing_for_parameters
         parameters = respond_to?(:filter_parameters) ? filter_parameters(params) : params.dup
         parameters = parameters.except!(:controller, :action, :format, :_method)
 
-        logger.info "  Parameters: #{parameters.inspect}" unless parameters.empty?
+        logger.debug "  Parameters: #{parameters.inspect}" unless parameters.empty?
       end
 
       def default_render #:nodoc:

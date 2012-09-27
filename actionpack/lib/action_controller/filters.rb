@@ -673,7 +673,7 @@ module ActionController #:nodoc:
 
         def halt_filter_chain(filter, reason)
           @before_filter_chain_aborted = true
-          logger.info "Filter chain halted as [#{filter.inspect}] #{reason}." if logger
+          logger.debug "Filter chain halted as [#{filter.inspect}] #{reason}." if logger
         end
     end
   end
