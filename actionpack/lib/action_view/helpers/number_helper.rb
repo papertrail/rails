@@ -71,6 +71,8 @@ module ActionView
       #  number_to_currency(1234567890.50, :unit => "&pound;", :separator => ",", :delimiter => "", :format => "%n %u")
       #  # => 1234567890,50 &pound;
       def number_to_currency(number, options = {})
+        return unless number
+
         options.symbolize_keys!
 
         defaults  = I18n.translate(:'number.format', :locale => options[:locale], :raise => true) rescue {}
@@ -85,11 +87,12 @@ module ActionView
         separator = '' if precision == 0
 
         begin
-          format.gsub(/%n/, number_with_precision(number,
+          value = number_with_precision(number,
             :precision => precision,
             :delimiter => delimiter,
-            :separator => separator)
-          ).gsub(/%u/, unit).html_safe
+            :separator => separator
+          )
+          format.gsub(/%n/, ERB::Util.html_escape(value)).gsub(/%u/, ERB::Util.html_escape(unit)).html_safe
         rescue
           number
         end
