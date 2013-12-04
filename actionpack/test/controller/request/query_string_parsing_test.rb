@@ -12,6 +12,19 @@ class QueryStringParsingTest < ActionController::IntegrationTest
     end
   end
 
+  class EarlyParse
+    def initialize(app)
+      @app = app
+    end
+
+    def call(env)
+      # Trigger a Rack parse so that env caches the query params
+      Rack::Request.new(env).params
+      @app.call(env)
+    end
+  end
+
+
   def teardown
     TestController.last_query_parameters = nil
   end
@@ -119,6 +132,19 @@ class QueryStringParsingTest < ActionController::IntegrationTest
       with_routing do |set|
         set.draw do |map|
           map.connect ':action', :controller => "query_string_parsing_test/test"
+        end
+
+        get "/parse", actual
+        assert_response :ok
+        assert_equal(expected, TestController.last_query_parameters)
+
+        reset!
+
+        default_application = @integration_session.application
+
+        @integration_session.application = Rack::Builder.new do
+          use EarlyParse
+          run default_application
         end
 
         get "/parse", actual
