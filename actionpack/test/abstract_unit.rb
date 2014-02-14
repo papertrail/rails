@@ -75,4 +75,24 @@ class ActionController::IntegrationTest < ActiveSupport::TestCase
   end
 end
 
+module RailsXssEmulation
+  module ContentTag
+    def self.included(by)
+      by.alias_method_chain :content_tag_string, :escaping
+    end
+
+    private
+
+    def content_tag_string_with_escaping(name, content, options, escape = true)
+      content_tag_string_without_escaping(name, escape ? ERB::Util.h(content) : content, options, escape)
+    end
+
+  end
+
+  class InstanceTagWithRailsXss < ActionView::Helpers::InstanceTag
+    include RailsXssEmulation::ContentTag
+  end
+
+end
+
 ActionController::Reloader.default_lock = DummyMutex.new

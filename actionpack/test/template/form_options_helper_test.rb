@@ -801,11 +801,36 @@ class FormOptionsHelperTest < ActionView::TestCase
     )
   end
 
+  def test_select_escapes_options
+    assert_dom_equal(
+      '<select id="post_title" name="post[title]">&lt;script&gt;alert(1)&lt;/script&gt;</select>',
+      select_with_rails_xss('post', 'title', '<script>alert(1)</script>')
+    )
+  end
+
+  def test_select_escapes_prompt
+    assert_dom_equal(
+      '<select name="post[title]" id="post_title"><option value="">&lt;script&gt;prompt&lt;/script&gt;</option></select>',
+      select_with_rails_xss('post', 'title', '', :prompt => '<script>prompt</script>')
+    )
+  end
+
+  def test_select_include_blank
+    assert_dom_equal(
+      '<select name="post[title]" id="post_title"><option value="">&lt;script&gt;include_blank&lt;/script&gt;</option></select>',
+      select_with_rails_xss('post', 'title', '', :include_blank => '<script>include_blank</script>')
+    )
+  end
+
   private
 
     def dummy_posts
       [ Post.new("<Abe> went home", "<Abe>", "To a little house", "shh!"),
         Post.new("Babe went home", "Babe", "To a little house", "shh!"),
         Post.new("Cabe went home", "Cabe", "To a little house", "shh!") ]
+    end
+
+    def select_with_rails_xss(object, method, choices, options = {}, html_options = {})
+      RailsXssEmulation::InstanceTagWithRailsXss.new(object, method, self, options.delete(:object)).to_select_tag(choices, options, html_options)
     end
 end
