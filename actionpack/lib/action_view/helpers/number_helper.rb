@@ -83,7 +83,7 @@ module ActionView
         unit      = options[:unit]      || defaults[:unit]
         separator = options[:separator] || defaults[:separator]
         delimiter = options[:delimiter] || defaults[:delimiter]
-        format    = options[:format]    || defaults[:format]
+        format    = options[:format] ? ERB::Util.html_escape(options[:format]) : defaults[:format]
         separator = '' if precision == 0
 
         begin
