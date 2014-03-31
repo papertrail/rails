@@ -186,14 +186,13 @@ module ActiveSupport
     end
 
     def utc_offset
-      if @utc_offset
-        @utc_offset
-      else
-        @current_period ||= tzinfo.current_period
+      @current_period ||= tzinfo.current_period
+      if @current_period
         @current_period.utc_offset
+      else
+        @utc_offset
       end
     end
-
     # Returns the offset of this time zone as a formatted string, of the
     # format "+HH:MM".
     def formatted_offset(colon=true, alternate_utc_string = nil)
