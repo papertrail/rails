@@ -74,10 +74,7 @@ module ActiveRecord
         @queue = @connection_mutex.new_cond
 
         # default 5 second timeout unless on ruby 1.9
-        @timeout =
-          if RUBY_VERSION < '1.9'
-            spec.config[:wait_timeout] || 5
-          end
+        @timeout = spec.config[:wait_timeout] || 5
 
         # default max pool size to 5
         @size = (spec.config[:pool] && spec.config[:pool].to_i) || 5
