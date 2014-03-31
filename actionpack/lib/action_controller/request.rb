@@ -489,7 +489,7 @@ EOM
           else
             h = {}
             value.each { |k, v| h[k] = normalize_parameters(v) }
-            h.with_indifferent_access
+            deep_munge(h.with_indifferent_access)
           end
         when Array
           value.map { |e| normalize_parameters(e) }
