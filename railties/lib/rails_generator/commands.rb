@@ -299,7 +299,7 @@ HELP
             # Evaluate any assignments in a temporary, throwaway binding.
             vars = template_options[:assigns] || {}
             b = template_options[:binding] || binding
-            vars.each { |k,v| eval "#{k} = vars[:#{k}] || vars['#{k}']", b }
+            vars.each { |k, v| b.local_variable_set(:"#{k}", v) }
 
             # Render the source file with the temporary binding.
             ERB.new(file.read, nil, '-').result(b)
