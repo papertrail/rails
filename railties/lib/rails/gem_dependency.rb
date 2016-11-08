@@ -1,11 +1,5 @@
 require 'rails/vendor_gem_source_index'
 
-module Gem
-  def self.source_index=(index)
-    @@source_index = index
-  end
-end
-
 module Rails
   class GemDependency < Gem::Dependency
     attr_accessor :lib, :source, :dep
@@ -18,10 +12,6 @@ module Rails
 
     def self.add_frozen_gem_path
       @@paths_loaded ||= begin
-        source_index = Rails::VendorGemSourceIndex.new(Gem.source_index)
-        Gem.clear_paths
-        Gem.source_index = source_index
-        # loaded before us - we can't change them, so mark them
         Gem.loaded_specs.each do |name, spec|
           @@framework_gems[name] = spec
         end
@@ -74,8 +64,7 @@ module Rails
       end
 
       begin
-        dep = Gem::Dependency.new(name, requirement)
-        spec = Gem.source_index.find { |_,s| s.satisfies_requirement?(dep) }.last
+        spec = Gem::Specification.find_all_by_name(name, requirement).last
         spec.activate           # a way that exists
       rescue
         gem self.name, self.requirement # <  1.8 unhappy way
@@ -101,7 +90,7 @@ module Rails
       # code repeated from Gem.activate. Find a matching spec, or the currently loaded version.
       # error out if loaded version and requested version are incompatible.
       @spec ||= begin
-        matches = Gem.source_index.search(self)
+        matches = Gem::Specification.find_all_by_name(self.name)
         matches << @@framework_gems[name] if framework_gem?
         if Gem.loaded_specs[name] then
           # This gem is already loaded.  If the currently loaded gem is not in the
@@ -218,10 +207,7 @@ module Rails
     end
 
     def refresh
-      Rails::VendorGemSourceIndex.silence_spec_warnings = true
-      real_gems = Gem.source_index.installed_source_index
-      exact_dep = Gem::Dependency.new(name, "= #{specification.version}")
-      matches = real_gems.search(exact_dep)
+      matches = Gem::Specification.find_all_by_name(name, "= #{specification.version}")
       installed_spec = matches.first
       if frozen?
         if installed_spec
