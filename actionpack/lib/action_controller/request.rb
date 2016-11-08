@@ -494,6 +494,7 @@ EOM
         when Array
           value.map { |e| normalize_parameters(e) }
         else
+          value.force_encoding(Encoding.default_external) if value.respond_to?(:force_encoding)
           value
         end
       end

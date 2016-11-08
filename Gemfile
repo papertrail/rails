@@ -9,6 +9,7 @@ gem 'mysql', '=2.8.1'
 gem 'rack', '< 1.5'
 gem 'pg', '=0.9.0'
 gem 'nokogiri', '1.3.3'
-gem 'libxml-ruby', '=1.1.4'
+gem 'libxml-ruby', '2.9.0'
+gem 'iconv', '1.0.4'
 
 gem 'railslts-version', :path => 'railslts-version'
